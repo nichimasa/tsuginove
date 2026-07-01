@@ -60,6 +60,22 @@ ALTER TABLE public.room_participants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "profiles_select" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_insert" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_update" ON public.profiles;
+DROP POLICY IF EXISTS "rooms_select" ON public.rooms;
+DROP POLICY IF EXISTS "rooms_insert" ON public.rooms;
+DROP POLICY IF EXISTS "rooms_update" ON public.rooms;
+DROP POLICY IF EXISTS "participants_select" ON public.room_participants;
+DROP POLICY IF EXISTS "participants_insert" ON public.room_participants;
+DROP POLICY IF EXISTS "participants_update" ON public.room_participants;
+DROP POLICY IF EXISTS "posts_select" ON public.posts;
+DROP POLICY IF EXISTS "posts_insert" ON public.posts;
+DROP POLICY IF EXISTS "notifications_select" ON public.notifications;
+DROP POLICY IF EXISTS "notifications_insert" ON public.notifications;
+DROP POLICY IF EXISTS "notifications_update" ON public.notifications;
+
 -- Profiles: anyone can read, only self can update
 CREATE POLICY "profiles_select" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "profiles_insert" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
