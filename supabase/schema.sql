@@ -84,8 +84,8 @@ CREATE POLICY "profiles_update" ON public.profiles FOR UPDATE USING (auth.uid() 
 -- Rooms: creator can manage, participants can read
 CREATE POLICY "rooms_select" ON public.rooms FOR SELECT USING (
   creator_id = auth.uid()
-  OR id IN (SELECT room_id FROM public.room_participants WHERE user_id = auth.uid())
   OR (visibility = 'limited' OR visibility = 'public')
+  OR EXISTS (SELECT 1 FROM public.room_participants rp WHERE rp.room_id = id AND rp.user_id = auth.uid())
 );
 CREATE POLICY "rooms_insert" ON public.rooms FOR INSERT WITH CHECK (creator_id = auth.uid());
 CREATE POLICY "rooms_update" ON public.rooms FOR UPDATE USING (creator_id = auth.uid());
@@ -93,13 +93,12 @@ CREATE POLICY "rooms_update" ON public.rooms FOR UPDATE USING (creator_id = auth
 -- Room participants: participants and creator can read
 CREATE POLICY "participants_select" ON public.room_participants FOR SELECT USING (
   user_id = auth.uid()
-  OR room_id IN (SELECT id FROM public.rooms WHERE creator_id = auth.uid())
-  OR room_id IN (SELECT room_id FROM public.room_participants WHERE user_id = auth.uid())
+  OR EXISTS (SELECT 1 FROM public.rooms r WHERE r.id = room_id AND r.creator_id = auth.uid())
 );
 CREATE POLICY "participants_insert" ON public.room_participants FOR INSERT WITH CHECK (user_id = auth.uid());
 CREATE POLICY "participants_update" ON public.room_participants FOR UPDATE USING (
-  room_id IN (SELECT id FROM public.rooms WHERE creator_id = auth.uid())
-  OR user_id = auth.uid()
+  user_id = auth.uid()
+  OR EXISTS (SELECT 1 FROM public.rooms r WHERE r.id = room_id AND r.creator_id = auth.uid())
 );
 
 -- Posts: restrict to participants; completed rooms or own posts visible

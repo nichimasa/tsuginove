@@ -46,7 +46,8 @@ export default function NewRoomPage() {
       .single()
 
     if (error || !room) {
-      toast('ルームの作成に失敗しました', 'error')
+      console.error('Room creation error:', JSON.stringify(error))
+      toast(`ルームの作成に失敗しました: ${error?.message ?? '不明なエラー'}`, 'error')
       setLoading(false)
       return
     }
